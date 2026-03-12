@@ -331,6 +331,7 @@ main {
   color: #fff;
 }
 
-.arb-card-live {
+.arb-card-live,
+.game-card-live {
   border-color: #e74c3c;
 }

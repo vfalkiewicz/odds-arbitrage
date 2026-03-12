@@ -161,6 +161,74 @@ function calcProfit(arb, totalWager) {
   return `Profit: <strong>$${profit}</strong> &mdash; ${stakes}`;
 }
 
+function isGameLive(game) {
+  if (!game.commence_time) return false;
+  return new Date(game.commence_time) <= new Date();
+}
+
+function renderOddsCard(game) {
+  const bookmakers = game.bookmakers || [];
+  if (bookmakers.length === 0) return "";
+  const live = isGameLive(game);
+  const statusBadge = live
+    ? '<span class="status-badge live">LIVE</span>'
+    : '<span class="status-badge upcoming">UPCOMING</span>';
+
+  const marketKeys = [...new Set(bookmakers.flatMap(b => b.markets.map(m => m.key)))];
+
+  return marketKeys.map(mk => {
+    const bestOdds = {};
+    const rows = [];
+
+    bookmakers.forEach(bk => {
+      const market = bk.markets.find(m => m.key === mk);
+      if (!market) return;
+      const row = { bookmaker: bk.title };
+      market.outcomes.forEach(o => {
+        row[o.name] = o.price;
+        if (!bestOdds[o.name] || o.price > bestOdds[o.name]) {
+          bestOdds[o.name] = o.price;
+        }
+      });
+      rows.push(row);
+    });
+
+    if (rows.length === 0) return "";
+
+    const outcomeNames = [...new Set(rows.flatMap(r => Object.keys(r).filter(k => k !== "bookmaker")))];
+
+    return `
+      <div class="game-card ${live ? 'game-card-live' : ''}">
+        <div class="game-header">
+          <span>${statusBadge} ${game.away_team} @ ${game.home_team}</span>
+          <span class="game-sport">${game.sport_title} &middot; ${formatMarket(mk)}</span>
+        </div>
+        <table class="odds-table">
+          <thead>
+            <tr>
+              <th>Sportsbook</th>
+              ${outcomeNames.map(n => `<th>${n}</th>`).join("")}
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(r => `
+              <tr>
+                <td>${r.bookmaker}</td>
+                ${outcomeNames.map(n => {
+                  const val = r[n];
+                  const isBest = val === bestOdds[n];
+                  const display = val !== undefined ? (val > 0 ? `+${val}` : val) : "-";
+                  return `<td class="${isBest ? "best-odds" : ""}">${display}</td>`;
+                }).join("")}
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }).join("");
+}
+
 function renderOdds() {
   const container = $("#odds-list");
   if (oddsData.length === 0) {
@@ -168,64 +236,26 @@ function renderOdds() {
     return;
   }
 
-  container.innerHTML = oddsData.map(game => {
-    const bookmakers = game.bookmakers || [];
-    if (bookmakers.length === 0) return "";
+  const liveGames = oddsData.filter(g => isGameLive(g));
+  const upcomingGames = oddsData.filter(g => !isGameLive(g));
 
-    const marketKeys = [...new Set(bookmakers.flatMap(b => b.markets.map(m => m.key)))];
+  let html = "";
 
-    return marketKeys.map(mk => {
-      const bestOdds = {};
-      const rows = [];
+  html += `<h2 class="section-heading">In Progress Games (Live) <span class="section-count">${liveGames.length}</span></h2>`;
+  if (liveGames.length > 0) {
+    html += liveGames.map(g => renderOddsCard(g)).join("");
+  } else {
+    html += '<div class="no-data-small">No live games right now.</div>';
+  }
 
-      bookmakers.forEach(bk => {
-        const market = bk.markets.find(m => m.key === mk);
-        if (!market) return;
-        const row = { bookmaker: bk.title };
-        market.outcomes.forEach(o => {
-          row[o.name] = o.price;
-          if (!bestOdds[o.name] || o.price > bestOdds[o.name]) {
-            bestOdds[o.name] = o.price;
-          }
-        });
-        rows.push(row);
-      });
+  html += `<h2 class="section-heading">Upcoming Games <span class="section-count">${upcomingGames.length}</span></h2>`;
+  if (upcomingGames.length > 0) {
+    html += upcomingGames.map(g => renderOddsCard(g)).join("");
+  } else {
+    html += '<div class="no-data-small">No upcoming games right now.</div>';
+  }
 
-      if (rows.length === 0) return "";
-
-      const outcomeNames = [...new Set(rows.flatMap(r => Object.keys(r).filter(k => k !== "bookmaker")))];
-
-      return `
-        <div class="game-card">
-          <div class="game-header">
-            <span>${game.away_team} @ ${game.home_team}</span>
-            <span class="game-sport">${game.sport_title} &middot; ${formatMarket(mk)}</span>
-          </div>
-          <table class="odds-table">
-            <thead>
-              <tr>
-                <th>Sportsbook</th>
-                ${outcomeNames.map(n => `<th>${n}</th>`).join("")}
-              </tr>
-            </thead>
-            <tbody>
-              ${rows.map(r => `
-                <tr>
-                  <td>${r.bookmaker}</td>
-                  ${outcomeNames.map(n => {
-                    const val = r[n];
-                    const isBest = val === bestOdds[n];
-                    const display = val !== undefined ? (val > 0 ? `+${val}` : val) : "-";
-                    return `<td class="${isBest ? "best-odds" : ""}">${display}</td>`;
-                  }).join("")}
-                </tr>
-              `).join("")}
-            </tbody>
-          </table>
-        </div>
-      `;
-    }).join("");
-  }).join("");
+  container.innerHTML = html;
 }
 
 function renderKalshi() {
