@@ -85,8 +85,12 @@ def find_arbitrage(games):
                         "status": "live" if live else "upcoming",
                     })
 
-            elif market_key in ("spreads", "totals"):
-                # Group by point value -- only compare same lines across books
+            elif market_key == "spreads":
+                # For spreads, each bookmaker provides complementary pairs:
+                # Team A at +1.5 and Team B at -1.5
+                # We need to compare the SAME side across books.
+                # Use "team_name + signed_point" as the label to avoid mixing up
+                # -1.5 and +1.5 for the same team.
                 point_groups = {}
                 for bk in bookmakers:
                     for m in bk.get("markets", []):
@@ -96,20 +100,71 @@ def find_arbitrage(games):
                             point = outcome.get("point")
                             if point is None:
                                 continue
-                            # For spreads: group by abs(point) since one team is +X and the other is -X
-                            # For totals: group by point value since Over and Under share the same number
                             group_key = abs(point)
                             if group_key not in point_groups:
                                 point_groups[group_key] = {}
 
                             decimal = american_to_decimal(outcome["price"])
-                            label = outcome["name"]
+                            # Include the signed point in the label so
+                            # "Team A -1.5" and "Team A +1.5" are different outcomes
+                            label = f"{outcome['name']} ({'+' if point > 0 else ''}{point})"
                             american = outcome["price"]
 
                             if label not in point_groups[group_key] or decimal > point_groups[group_key][label][0]:
                                 point_groups[group_key][label] = (decimal, bk["title"], point, american)
 
                 for point_val, best_odds in point_groups.items():
+                    # Only valid if we have exactly 2 complementary sides
+                    # (one positive point, one negative point)
+                    points = [v[2] for v in best_odds.values()]
+                    has_pos = any(p > 0 for p in points)
+                    has_neg = any(p < 0 for p in points)
+                    if not (has_pos and has_neg):
+                        continue
+
+                    result = _check_arb(best_odds)
+                    if result:
+                        profit_pct, arb_outcomes = result
+                        opportunities.append({
+                            "game_id": game.get("id", ""),
+                            "home_team": game.get("home_team", ""),
+                            "away_team": game.get("away_team", ""),
+                            "sport_key": game.get("sport_key", ""),
+                            "sport_title": game.get("sport_title", ""),
+                            "market": market_key,
+                            "profit_pct": profit_pct,
+                            "outcomes": arb_outcomes,
+                            "commence_time": commence_time,
+                            "status": "live" if live else "upcoming",
+                        })
+
+            elif market_key == "totals":
+                # For totals, outcomes are "Over" and "Under" at the same point
+                # Group by exact point value, label by Over/Under
+                point_groups = {}
+                for bk in bookmakers:
+                    for m in bk.get("markets", []):
+                        if m["key"] != market_key:
+                            continue
+                        for outcome in m.get("outcomes", []):
+                            point = outcome.get("point")
+                            if point is None:
+                                continue
+                            group_key = point
+                            if group_key not in point_groups:
+                                point_groups[group_key] = {}
+
+                            decimal = american_to_decimal(outcome["price"])
+                            label = outcome["name"]  # "Over" or "Under"
+                            american = outcome["price"]
+
+                            if label not in point_groups[group_key] or decimal > point_groups[group_key][label][0]:
+                                point_groups[group_key][label] = (decimal, bk["title"], point, american)
+
+                for point_val, best_odds in point_groups.items():
+                    if "Over" not in best_odds or "Under" not in best_odds:
+                        continue
+
                     result = _check_arb(best_odds)
                     if result:
                         profit_pct, arb_outcomes = result
