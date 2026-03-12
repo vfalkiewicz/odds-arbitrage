@@ -335,3 +335,9 @@ main {
 .game-card-live {
   border-color: #e74c3c;
 }
+
+.point-label {
+  color: #f0c040;
+  font-weight: 700;
+  margin-right: 0.2rem;
+}

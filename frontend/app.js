@@ -180,12 +180,14 @@ function renderOddsCard(game) {
     const bestOdds = {};
     const rows = [];
 
+    const hasPoints = (mk === "spreads" || mk === "totals");
+
     bookmakers.forEach(bk => {
       const market = bk.markets.find(m => m.key === mk);
       if (!market) return;
       const row = { bookmaker: bk.title };
       market.outcomes.forEach(o => {
-        row[o.name] = o.price;
+        row[o.name] = { price: o.price, point: o.point };
         if (!bestOdds[o.name] || o.price > bestOdds[o.name]) {
           bestOdds[o.name] = o.price;
         }
@@ -215,10 +217,16 @@ function renderOddsCard(game) {
               <tr>
                 <td>${r.bookmaker}</td>
                 ${outcomeNames.map(n => {
-                  const val = r[n];
+                  const cell = r[n];
+                  if (!cell) return `<td>-</td>`;
+                  const val = cell.price;
+                  const pt = cell.point;
                   const isBest = val === bestOdds[n];
-                  const display = val !== undefined ? (val > 0 ? `+${val}` : val) : "-";
-                  return `<td class="${isBest ? "best-odds" : ""}">${display}</td>`;
+                  const priceStr = val > 0 ? `+${val}` : `${val}`;
+                  const pointStr = hasPoints && pt !== undefined && pt !== null
+                    ? `<span class="point-label">${pt > 0 ? "+" : ""}${pt}</span> `
+                    : "";
+                  return `<td class="${isBest ? "best-odds" : ""}">${pointStr}(${priceStr})</td>`;
                 }).join("")}
               </tr>
             `).join("")}
