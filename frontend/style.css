@@ -1,0 +1,279 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #0f1923;
+  color: #e0e6ed;
+  min-height: 100vh;
+}
+
+header {
+  text-align: center;
+  padding: 2rem 1rem 1rem;
+  background: linear-gradient(135deg, #1a2a3a 0%, #0f1923 100%);
+  border-bottom: 1px solid #1e3a5f;
+}
+
+header h1 {
+  font-size: 1.8rem;
+  color: #00d4aa;
+}
+
+.subtitle {
+  color: #7a8ea0;
+  margin-top: 0.3rem;
+  font-size: 0.9rem;
+}
+
+.sport-tabs, .view-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  flex-wrap: wrap;
+}
+
+.tab, .view-tab {
+  padding: 0.5rem 1.2rem;
+  border: 1px solid #1e3a5f;
+  background: #152232;
+  color: #7a8ea0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.tab:hover, .view-tab:hover {
+  border-color: #00d4aa;
+  color: #00d4aa;
+}
+
+.tab.active, .view-tab.active {
+  background: #00d4aa;
+  color: #0f1923;
+  border-color: #00d4aa;
+  font-weight: 600;
+}
+
+#config-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 1.5rem;
+  background: #152232;
+  border-bottom: 1px solid #1e3a5f;
+  flex-wrap: wrap;
+}
+
+#config-bar label {
+  font-size: 0.8rem;
+  color: #7a8ea0;
+}
+
+#config-bar input {
+  background: #0f1923;
+  border: 1px solid #1e3a5f;
+  color: #e0e6ed;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  width: 220px;
+}
+
+#refresh-btn {
+  padding: 0.4rem 1rem;
+  background: #00d4aa;
+  color: #0f1923;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+#refresh-btn:hover {
+  background: #00b894;
+}
+
+#status {
+  font-size: 0.8rem;
+  color: #7a8ea0;
+}
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Arbitrage cards */
+.arb-card {
+  background: #152232;
+  border: 1px solid #1e3a5f;
+  border-radius: 8px;
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.2s;
+}
+
+.arb-card:hover {
+  border-color: #00d4aa;
+}
+
+.arb-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.arb-matchup {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.arb-profit {
+  background: #00d4aa;
+  color: #0f1923;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.arb-meta {
+  font-size: 0.75rem;
+  color: #7a8ea0;
+  margin-bottom: 0.8rem;
+}
+
+.arb-outcomes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.8rem;
+}
+
+.outcome-card {
+  background: #1a2a3a;
+  border-radius: 6px;
+  padding: 0.8rem;
+}
+
+.outcome-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+
+.outcome-book {
+  color: #00d4aa;
+  font-size: 0.8rem;
+}
+
+.outcome-odds {
+  font-size: 0.85rem;
+  color: #7a8ea0;
+  margin-top: 0.2rem;
+}
+
+.outcome-stake {
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
+  color: #f0c040;
+}
+
+/* Odds comparison table */
+.game-card {
+  background: #152232;
+  border: 1px solid #1e3a5f;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.game-header {
+  padding: 0.8rem 1rem;
+  background: #1a2a3a;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+}
+
+.game-sport {
+  font-size: 0.75rem;
+  color: #00d4aa;
+}
+
+.odds-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.odds-table th {
+  text-align: left;
+  padding: 0.5rem 0.8rem;
+  background: #0f1923;
+  color: #7a8ea0;
+  font-weight: 500;
+  border-bottom: 1px solid #1e3a5f;
+}
+
+.odds-table td {
+  padding: 0.5rem 0.8rem;
+  border-bottom: 1px solid #1a2a3a;
+}
+
+.odds-table tr:hover td {
+  background: #1a2a3a;
+}
+
+.best-odds {
+  color: #00d4aa;
+  font-weight: 700;
+}
+
+.no-data {
+  text-align: center;
+  padding: 3rem;
+  color: #7a8ea0;
+  font-size: 1.1rem;
+}
+
+/* Stake calculator */
+.calc-section {
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid #1e3a5f;
+}
+
+.calc-section label {
+  font-size: 0.8rem;
+  color: #7a8ea0;
+}
+
+.calc-section input {
+  background: #0f1923;
+  border: 1px solid #1e3a5f;
+  color: #e0e6ed;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  width: 120px;
+  font-size: 0.85rem;
+  margin-left: 0.5rem;
+}
+
+.calc-result {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #f0c040;
+}

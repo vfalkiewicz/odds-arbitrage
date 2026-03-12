@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Odds Arbitrage Scanner</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Odds Arbitrage Scanner</h1>
+    <p class="subtitle">Find guaranteed profit opportunities across sportsbooks</p>
+  </header>
+
+  <nav class="sport-tabs">
+    <button class="tab active" data-sport="all">All Sports</button>
+    <button class="tab" data-sport="americanfootball_nfl">NFL</button>
+    <button class="tab" data-sport="basketball_nba">NBA</button>
+    <button class="tab" data-sport="baseball_mlb">MLB</button>
+    <button class="tab" data-sport="icehockey_nhl">NHL</button>
+  </nav>
+
+  <nav class="view-tabs">
+    <button class="view-tab active" data-view="arbitrage">Arbitrage Opportunities</button>
+    <button class="view-tab" data-view="odds">Odds Comparison</button>
+    <button class="view-tab" data-view="kalshi">Kalshi Markets</button>
+  </nav>
+
+  <div id="config-bar">
+    <label>API Base URL:
+      <input type="text" id="api-url" value="" placeholder="Auto-detect (or enter URL)" />
+    </label>
+    <button id="refresh-btn">Refresh Data</button>
+    <span id="status"></span>
+  </div>
+
+  <main>
+    <section id="arbitrage-view">
+      <div id="arb-list"></div>
+    </section>
+
+    <section id="odds-view" class="hidden">
+      <div id="odds-list"></div>
+    </section>
+
+    <section id="kalshi-view" class="hidden">
+      <div id="kalshi-list"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
