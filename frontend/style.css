@@ -277,3 +277,60 @@ main {
   font-size: 0.85rem;
   color: #f0c040;
 }
+
+/* Section headings for live/upcoming */
+.section-heading {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #e0e6ed;
+  margin: 1.5rem 0 0.8rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #1e3a5f;
+}
+
+.section-heading:first-child {
+  margin-top: 0;
+}
+
+.section-count {
+  background: #1e3a5f;
+  color: #7a8ea0;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.no-data-small {
+  text-align: center;
+  padding: 1.5rem;
+  color: #7a8ea0;
+  font-size: 0.9rem;
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  vertical-align: middle;
+  margin-right: 0.4rem;
+}
+
+.status-badge.live {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.status-badge.upcoming {
+  background: #2980b9;
+  color: #fff;
+}
+
+.arb-card-live {
+  border-color: #e74c3c;
+}

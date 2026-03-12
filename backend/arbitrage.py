@@ -1,7 +1,21 @@
+from datetime import datetime, timezone
+
+
 def american_to_decimal(american):
     if american > 0:
         return (american / 100) + 1
     return (100 / abs(american)) + 1
+
+
+def _is_live(commence_time_str):
+    """Return True if the game has already started."""
+    if not commence_time_str:
+        return False
+    try:
+        ct = datetime.fromisoformat(commence_time_str.replace("Z", "+00:00"))
+        return ct <= datetime.now(timezone.utc)
+    except Exception:
+        return False
 
 
 def _check_arb(best_odds):
@@ -33,6 +47,8 @@ def find_arbitrage(games):
 
     for game in games:
         bookmakers = game.get("bookmakers", [])
+        commence_time = game.get("commence_time", "")
+        live = _is_live(commence_time)
         market_keys = set()
         for bk in bookmakers:
             for m in bk.get("markets", []):
@@ -65,6 +81,8 @@ def find_arbitrage(games):
                         "market": market_key,
                         "profit_pct": profit_pct,
                         "outcomes": arb_outcomes,
+                        "commence_time": commence_time,
+                        "status": "live" if live else "upcoming",
                     })
 
             elif market_key in ("spreads", "totals"):
@@ -104,6 +122,8 @@ def find_arbitrage(games):
                             "market": market_key,
                             "profit_pct": profit_pct,
                             "outcomes": arb_outcomes,
+                            "commence_time": commence_time,
+                            "status": "live" if live else "upcoming",
                         })
 
     opportunities.sort(key=lambda o: o["profit_pct"], reverse=True)

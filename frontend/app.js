@@ -83,17 +83,15 @@ function refreshData() {
 
 // --- Rendering ---
 
-function renderArbitrage() {
-  const container = $("#arb-list");
-  if (arbData.length === 0) {
-    container.innerHTML = '<div class="no-data">No arbitrage opportunities found. Try refreshing or selecting a different sport.</div>';
-    return;
-  }
+function renderArbCard(arb, i) {
+  const statusBadge = arb.status === "live"
+    ? '<span class="status-badge live">LIVE</span>'
+    : '<span class="status-badge upcoming">UPCOMING</span>';
 
-  container.innerHTML = arbData.map((arb, i) => `
-    <div class="arb-card">
+  return `
+    <div class="arb-card ${arb.status === 'live' ? 'arb-card-live' : ''}">
       <div class="arb-header">
-        <span class="arb-matchup">${arb.away_team} @ ${arb.home_team}</span>
+        <span class="arb-matchup">${statusBadge} ${arb.away_team} @ ${arb.home_team}</span>
         <span class="arb-profit">+${arb.profit_pct}% Profit</span>
       </div>
       <div class="arb-meta">${arb.sport_title} &middot; Market: ${formatMarket(arb.market)}</div>
@@ -113,8 +111,37 @@ function renderArbitrage() {
         </label>
         <div class="calc-result" id="calc-${i}">${calcProfit(arb, 100)}</div>
       </div>
-    </div>
-  `).join("");
+    </div>`;
+}
+
+function renderArbitrage() {
+  const container = $("#arb-list");
+  if (arbData.length === 0) {
+    container.innerHTML = '<div class="no-data">No arbitrage opportunities found. Try refreshing or selecting a different sport.</div>';
+    return;
+  }
+
+  const liveArbs = arbData.filter(a => a.status === "live");
+  const upcomingArbs = arbData.filter(a => a.status !== "live");
+
+  let html = "";
+
+  html += `<h2 class="section-heading">In Progress Games (Live) <span class="section-count">${liveArbs.length}</span></h2>`;
+  if (liveArbs.length > 0) {
+    html += liveArbs.map((arb, i) => renderArbCard(arb, i)).join("");
+  } else {
+    html += '<div class="no-data-small">No live arbitrage opportunities right now.</div>';
+  }
+
+  const offset = liveArbs.length;
+  html += `<h2 class="section-heading">Upcoming Games <span class="section-count">${upcomingArbs.length}</span></h2>`;
+  if (upcomingArbs.length > 0) {
+    html += upcomingArbs.map((arb, i) => renderArbCard(arb, i + offset)).join("");
+  } else {
+    html += '<div class="no-data-small">No upcoming arbitrage opportunities right now.</div>';
+  }
+
+  container.innerHTML = html;
 
   $$(".wager-input").forEach(input => {
     input.addEventListener("input", (e) => {
